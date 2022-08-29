@@ -12,22 +12,29 @@ import {
 } from './styles';
 
 interface Props {
-  type: 'open' | 'closed'
+  type: 'up' | 'down' | 'total'
+  title: string
   amount: string,
   lastTransaction: string
 }
 
-export function Card({ amount, lastTransaction, type }: Props) {
+const icon = {
+  up: 'arrow-up-circle',
+  down: 'arrow-down-circle',
+  total: 'dollar-sign',
+}
+
+export function Card({ amount, lastTransaction, title, type }: Props) {
   return (
-    <Container>
+    <Container type={type}>
       <Header>
-        <Title>{type === 'open' ? 'Entrada' : 'Saída'}</Title>
-        <Icon name="power" />
+        <Title type={type}>{title}</Title>
+        <Icon name={icon[type]} type={type} />
       </Header>
 
       <Footer>
-        <Amount>{amount}</Amount>
-        <LastTransaction>{lastTransaction}</LastTransaction>
+        <Amount type={type}>{amount}</Amount>
+        <LastTransaction type={type}>{lastTransaction}</LastTransaction>
       </Footer>
     </Container>
   );
