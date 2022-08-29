@@ -38,6 +38,8 @@ export const TransactionsType = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  margin-top: 8px; //o certo é 16px mas o Input de cima já tem um margin-bottom de 8px;
+  margin-bottom: 16px;
 `
 
 
