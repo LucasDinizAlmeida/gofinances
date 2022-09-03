@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native'
 import { Card } from '../../components/Card';
-import { TransactionCard, TransactionCardProps } from '../../components/TransactionCard';
+import { TransactionCard } from '../../components/TransactionCard';
 import { FlatList } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
+
 
 import {
   Container,
@@ -16,51 +19,82 @@ import {
   HighlightCards,
   Transactions,
   Title,
-  TransactionsList
+  TransactionsList,
+  LogoutButton
 } from './styles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { dataKey } from '../register';
 
-export interface DataListProps extends TransactionCardProps {
-  id: string
-}
+import { DataListProps } from '../../utils/types/TransactiosType';
+
+// export interface DataListProps extends TransactionCardProps {
+//   id: string
+// }
 
 
 export function Dashboard() {
 
-  const data: DataListProps[] = [
-    {
-      id: '1',
-      title: 'Desenvolvimento de site',
-      amount: 'R$ 8.000,00',
-      category: {
-        name: 'Freelancer',
-        icon: 'dollar-sign'
-      },
-      type: 'up',
-      date: '12/10/2022',
-    },
-    {
-      id: '2',
-      title: 'gasolina',
-      amount: 'R$ 50,00',
-      category: {
-        name: 'moto',
-        icon: 'coffee'
-      },
-      type: 'down',
-      date: '12/10/2022',
-    },
-    {
-      id: '3',
-      title: 'gasolina',
-      amount: 'R$ 50,00',
-      category: {
-        name: 'moto',
-        icon: 'shopping-bag'
-      },
-      type: 'down',
-      date: '12/10/2022',
-    }
-  ]
+  const [transactions, setTransactions] = useState<DataListProps[]>([])
+
+  async function calcTotal() {
+
+    const data = await AsyncStorage.getItem(dataKey)
+    const transactionsList = data ? JSON.parse(data) : []
+
+    const income = transactionsList.filter((item: DataListProps) => item.type === 'up')
+    const outcome = transactionsList.filter((item: DataListProps) => item.type === 'down')
+
+    const positiveTotal = income.reduce(
+      (previousValue: Number, item: DataListProps) => Number(previousValue) + Number(item.amount), 0
+    )
+
+    const negativeTotal = outcome.reduce(
+      (previousValue: Number, item: DataListProps) => Number(previousValue) + Number(item.amount), 0
+    )
+
+    const total = positiveTotal - negativeTotal
+
+    console.log({
+      positiveTotal,
+      negativeTotal,
+      total
+    })
+  }
+
+  async function loadTransactions() {
+
+    const data = await AsyncStorage.getItem(dataKey)
+    const transactionsList = data ? JSON.parse(data) : []
+
+    const transactionsFormatted = transactionsList.map((item: DataListProps) => {
+
+      const amount = Number(item.amount)
+        .toLocaleString('pt-BR', {
+          style: 'currency',
+          currency: 'BRL'
+        })
+      const date = Intl.DateTimeFormat('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit'
+      }).format(new Date(item.date))
+
+      return { ...item, amount, date }
+
+    })
+
+    setTransactions(transactionsFormatted)
+  }
+
+  useFocusEffect(useCallback(() => {
+    loadTransactions()
+    calcTotal()
+  }, []))
+
+
+  useEffect(() => {
+    loadTransactions()
+  }, [])
 
   return (
     <>
@@ -75,7 +109,13 @@ export function Dashboard() {
               </User>
             </UserInfo>
 
-            <Icon name="power" />
+            <GestureHandlerRootView>
+              <LogoutButton>
+                <Icon name="power" />
+              </LogoutButton>
+            </GestureHandlerRootView>
+
+
           </UserWrapper>
         </Header>
 
@@ -108,7 +148,7 @@ export function Dashboard() {
           <Title>Listagem</Title>
 
           <TransactionsList
-            data={data}
+            data={transactions}
             keyExtractor={item => item.id}
             renderItem={({ item }) => <TransactionCard data={item} />}
           />

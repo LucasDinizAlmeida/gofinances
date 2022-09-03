@@ -15,7 +15,8 @@ import {
 
 interface Category {
   key: string,
-  name: string
+  name: string,
+  icon: string
 }
 
 interface Props {
