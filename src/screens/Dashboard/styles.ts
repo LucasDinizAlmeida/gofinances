@@ -6,13 +6,20 @@ import { Feather } from '@expo/vector-icons'
 import { getBottomSpace, getStatusBarHeight } from 'react-native-iphone-x-helper';
 
 import { FlatList, FlatListProps } from 'react-native'
-import { DataListProps } from '.'
+
 
 import { BorderlessButton } from 'react-native-gesture-handler'
+import { DataListProps } from '../../utils/types/TransactiosType';
 
 export const Container = styled.View`
   flex: 1;
   background-color: ${({ theme }) => theme.colors.background};
+`
+
+export const ContainerLoading = styled.View`
+  flex: 1;
+  align-items: center; 
+  justify-content: center;
 `
 
 export const Header = styled.View`

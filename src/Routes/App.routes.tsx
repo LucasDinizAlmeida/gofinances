@@ -7,6 +7,7 @@ import { MaterialIcons } from '@expo/vector-icons'
 import { Dashboard } from '../screens/Dashboard'
 import { Register } from '../screens/register'
 import { useTheme } from 'styled-components'
+import { Resume } from '../screens/Resume'
 
 export function AppRoutes() {
 
@@ -55,7 +56,7 @@ export function AppRoutes() {
       />
       <Screen
         name='Resumo'
-        component={Register}
+        component={Resume}
         options={{
           tabBarIcon: ({ size, color }) => (
             <MaterialIcons

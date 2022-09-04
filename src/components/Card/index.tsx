@@ -25,6 +25,7 @@ const icon = {
 }
 
 export function Card({ amount, lastTransaction, title, type }: Props) {
+
   return (
     <Container type={type}>
       <Header>
