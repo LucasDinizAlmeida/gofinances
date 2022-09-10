@@ -121,7 +121,6 @@ export function Register() {
   useEffect(() => {
     async function loadTransactions() {
       const transactions = await AsyncStorage.getItem(dataKey)
-      console.log(JSON.parse(transactions!))
     }
 
     loadTransactions()

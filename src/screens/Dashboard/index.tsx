@@ -60,83 +60,99 @@ export function Dashboard() {
     type: 'up' | 'down'
   ) {
 
+    if (collection.length === 0) { //dá erro se o array vier vazio, se não existir transação.
+      return '" nenhum "'
+    }
+
     const lastTransaction = Math.max.apply(Math, collection
       .filter(item => item.type === type)
-      .map(item => new Date(item.date).getTime())
-    )
+      .map(item => new Date(item.date).getTime()))
 
-    return Intl.DateTimeFormat('pt-br', {
+    // return Intl.DateTimeFormat('pt-br', {
+    //   day: '2-digit',
+    //   month: 'long'
+    // }).format(new Date(lastTransaction))
+
+    return new Date(lastTransaction).toLocaleDateString('pt-br', {
       day: '2-digit',
       month: 'long'
-    }).format(new Date(lastTransaction))
-
+    })
   }
 
 
 
   async function loadTransactions() {
 
-    const data = await AsyncStorage.getItem(dataKey)
-    const transactionsList = data ? JSON.parse(data) : []
+    try {
 
-    let income = 0
-    let expense = 0
+      const data = await AsyncStorage.getItem(dataKey)
+      const transactionsList = data ? JSON.parse(data!) : []
 
-    const transactionsFormatted = transactionsList.map((item: DataListProps) => {
+      let income = 0
+      let expense = 0
 
-      if (item.type === 'up') {
-        income += Number(item.amount)
-      } else {
-        expense += Number(item.amount)
-      }
+      const transactionsFormatted = transactionsList.map((item: DataListProps) => {
 
-      const amount = Number(item.amount)
-        .toLocaleString('pt-BR', {
-          style: 'currency',
-          currency: 'BRL'
-        })
-      const date = Intl.DateTimeFormat('pt-BR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: '2-digit'
-      }).format(new Date(item.date))
+        if (item.type === 'up') {
+          income += Number(item.amount)
+        } else {
+          expense += Number(item.amount)
+        }
 
-      return { ...item, amount, date }
+        const amount = Number(item.amount)
+          .toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+          })
+        const date = Intl.DateTimeFormat('pt-BR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: '2-digit'
+        }).format(new Date(item.date))
 
-    })
+        return { ...item, amount, date }
 
-    // pegar a data mais recente
-    const lastTransactionEntries = getLastTransactionDate(transactionsList, 'up')
-    const lastTransactionExpense = getLastTransactionDate(transactionsList, 'down')
-    const totalInterval = `01 à ${lastTransactionExpense}`
+      })
+
+      // pegar a data mais recente
+      const transactionsEntries = transactionsList.filter((item: DataListProps) => item.type === 'up')
+      const transactionsExpense = transactionsList.filter((item: DataListProps) => item.type === 'down')
+
+      const lastTransactionEntries = getLastTransactionDate(transactionsEntries, 'up')
+      const lastTransactionExpense = getLastTransactionDate(transactionsExpense, 'down')
+      const totalInterval = `01 à ${lastTransactionExpense}`
 
 
 
-    setTransactions(transactionsFormatted)
-    setHighlightData({
-      income: {
-        amount: income.toLocaleString('pt-br', {
-          style: 'currency',
-          currency: 'BRL'
-        }),
-        lastTransaction: lastTransactionEntries
-      },
-      expense: {
-        amount: expense.toLocaleString('pt-br', {
-          style: 'currency',
-          currency: 'BRL'
-        }),
-        lastTransaction: lastTransactionExpense
-      },
-      total: {
-        amount: (income - expense).toLocaleString('pt-br', {
-          style: 'currency',
-          currency: 'BRL'
-        }),
-        lastTransaction: totalInterval
-      }
-    })
-    setIsLoaded(true)
+      setTransactions(transactionsFormatted)
+      setHighlightData({
+        income: {
+          amount: income.toLocaleString('pt-br', {
+            style: 'currency',
+            currency: 'BRL'
+          }),
+          lastTransaction: lastTransactionEntries
+        },
+        expense: {
+          amount: expense.toLocaleString('pt-br', {
+            style: 'currency',
+            currency: 'BRL'
+          }),
+          lastTransaction: lastTransactionExpense
+        },
+        total: {
+          amount: (income - expense).toLocaleString('pt-br', {
+            style: 'currency',
+            currency: 'BRL'
+          }),
+          lastTransaction: totalInterval
+        }
+      })
+      setIsLoaded(true)
+
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   useFocusEffect(useCallback(() => {

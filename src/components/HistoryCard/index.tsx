@@ -16,7 +16,9 @@ export function HistoryCard({
   color,
   title
 }: Props) {
+
   return (
+
     <Container color={color}>
       <Title>{title}</Title>
       <Amount>{amount}</Amount>
