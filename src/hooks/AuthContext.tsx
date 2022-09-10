@@ -29,6 +29,8 @@ interface AuthContextProviderProps {
   children: ReactNode
 }
 
+const { CLIENT_ID, REDIRECT_URI } = process.env
+
 const AuthContext = createContext<AuthContextProps>({} as AuthContextProps)
 
 
@@ -41,8 +43,6 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
 
   async function sigInWithGoogle() {
     try {
-      const CLIENT_ID = '967860136217-b0j04gmsns9vlecquihnsajupd98kdsi.apps.googleusercontent.com'
-      const REDIRECT_URI = 'https://auth.expo.io/@lucas_slayer/gofinances2'
       const RESPONSE_TYPE = 'token'
       const SCOPE = encodeURI('profile email')
 
