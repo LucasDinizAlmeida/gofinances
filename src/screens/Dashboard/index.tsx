@@ -24,11 +24,12 @@ import {
   ContainerLoading
 } from './styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { dataKey } from '../register';
 
 import { DataListProps } from '../../utils/types/TransactiosType';
 import { isLoaded } from 'expo-font';
+
 import { useTheme } from 'styled-components';
+import { useAuthContext } from '../../hooks/AuthContext';
 
 // export interface DataListProps extends TransactionCardProps {
 //   id: string
@@ -49,6 +50,9 @@ interface HighlightData {
 export function Dashboard() {
 
   const theme = useTheme()
+  const { signOut, user } = useAuthContext()
+
+  const dataKey = `@gofinances:transactions_user:${user.id}`
 
   const [isLoaded, setIsLoaded] = useState(false)
 
@@ -61,7 +65,7 @@ export function Dashboard() {
   ) {
 
     if (collection.length === 0) { //dá erro se o array vier vazio, se não existir transação.
-      return '" nenhum "'
+      return ''
     }
 
     const lastTransaction = Math.max.apply(Math, collection
@@ -120,7 +124,7 @@ export function Dashboard() {
 
       const lastTransactionEntries = getLastTransactionDate(transactionsEntries, 'up')
       const lastTransactionExpense = getLastTransactionDate(transactionsExpense, 'down')
-      const totalInterval = `01 à ${lastTransactionExpense}`
+      const totalInterval = lastTransactionExpense === '' ? 'Nenhuma transação ainda' : `01 à ${lastTransactionExpense}`
 
 
 
@@ -177,15 +181,15 @@ export function Dashboard() {
               <Header>
                 <UserWrapper>
                   <UserInfo>
-                    <Photo source={{ uri: 'https://avatars.githubusercontent.com/u/92605557?v=4' }} />
+                    <Photo source={{ uri: user.picture }} />
                     <User>
                       <UserGreeting>Olá, </UserGreeting>
-                      <UserName>Lucas</UserName>
+                      <UserName>{user.given_name}</UserName>
                     </User>
                   </UserInfo>
 
                   <GestureHandlerRootView>
-                    <LogoutButton>
+                    <LogoutButton onPress={signOut}>
                       <Icon name="power" />
                     </LogoutButton>
                   </GestureHandlerRootView>
@@ -198,13 +202,23 @@ export function Dashboard() {
                 <Card
                   type='up'
                   amount={highlightData.income.amount}
-                  lastTransaction={`Última entrada dia ${highlightData.income.lastTransaction}`}
+                  lastTransaction={
+                    highlightData.income.lastTransaction === '' ?
+                      'Nenhuma transação ainda'
+                      :
+                      `Última entrada dia ${highlightData.income.lastTransaction}`
+                  }
                   title='Entradas'
                 />
                 <Card
                   type='down'
                   amount={highlightData.expense.amount}
-                  lastTransaction={`Última saída dia ${highlightData.expense.lastTransaction}`}
+                  lastTransaction={
+                    highlightData.expense.lastTransaction === '' ?
+                      'Nenhuma transação ainda'
+                      :
+                      `Última saída dia ${highlightData.expense.lastTransaction}`
+                  }
                   title='Saídas'
                 />
                 <Card

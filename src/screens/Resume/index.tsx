@@ -15,7 +15,6 @@ import {
   ChartContainer,
   ContainerLoading
 } from './styles';
-import { dataKey } from '../register';
 
 import { addMonths, format, subMonths } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -29,6 +28,7 @@ import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useFocusEffect } from '@react-navigation/native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useTheme } from 'styled-components';
+import { useAuthContext } from '../../hooks/AuthContext';
 
 
 interface TransactionByCategoryProps {
@@ -50,20 +50,16 @@ export function Resume() {
 
   const [totalByCategories, setTotalByCategories] = useState<TotalByCategoryProps[]>([])
 
+  const { user } = useAuthContext()
+  const dataKey = `@gofinances:transactions_user:${user.id}`
+
   const [isLoaded, setIsLoaded] = useState(false)
 
   const [dateSelected, setDateSelected] = useState(new Date())
 
   const theme = useTheme()
 
-  // function handleDateChange(action: 'next' | 'prev') {
-  //   if (action === 'next') {
-  //     setDateSelected(addMonths(dateSelected, 1))
-  //   } else {
-  //     setDateSelected(subMonths(dateSelected, 1))
-  //   }
 
-  // }
 
   function handleDateChange(action: 'prev' | 'next') {
     if (action === 'next') {

@@ -23,12 +23,12 @@ import {
 } from './styles';
 import { useNavigation } from '@react-navigation/native';
 import { DataListProps } from '../../utils/types/TransactiosType';
+import { useAuthContext } from '../../hooks/AuthContext';
 
 interface FormData {
   [name: string]: string;
 }
 
-export const dataKey = '@gofinances:transactions'
 
 const schema = yup.object({
   name: yup
@@ -44,6 +44,9 @@ const schema = yup.object({
 export function Register() {
 
   const [transactionType, setTransactionType] = useState('')
+
+  const { user } = useAuthContext()
+  const dataKey = `@gofinances:transactions_user:${user.id}`
 
   const [isOpenTransactionSelectModal, setIsOpenTransactionSelectModal] = useState(false)
 
